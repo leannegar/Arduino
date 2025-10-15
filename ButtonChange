@@ -1,0 +1,67 @@
+// Pin definitions
+const int rLedPin = 9;     // Red LED
+const int gLedPin = 10;    // Green LED
+const int bLedPin = 11;    // Blue LED
+const int buttonPin = 2;   // Button input
+
+// Mood variables
+int mood = 10;             // Start at neutral
+const int neutralMood = 10;
+const int maxMood = 20;
+const int minMood = 0;
+
+// Timing
+unsigned long lastPressMillis = 0;   // Time of last button press
+unsigned long lastDecayMillis = 0;   // Last time mood decreased
+const unsigned long decayDelay = 5000; // 5 seconds before starting to decay
+const unsigned long decayInterval = 1000; // decrease every 1 second after that
+
+// Button state tracking
+int lastButtonState = HIGH;
+
+void setup() {
+  pinMode(rLedPin, OUTPUT);
+  pinMode(gLedPin, OUTPUT);
+  pinMode(bLedPin, OUTPUT);
+  pinMode(buttonPin, INPUT_PULLUP); // use internal pull-up resistor
+}
+
+void loop() {
+  // Handle button press
+  int buttonState = digitalRead(buttonPin);
+  if (buttonState == LOW && lastButtonState == HIGH) { // detect press
+    if (mood < maxMood) {
+      mood++;
+    }
+    lastPressMillis = millis(); // reset the decay timer
+  }
+  lastButtonState = buttonState;
+
+  // Handle mood decay
+  unsigned long currentMillis = millis();
+  if (currentMillis - lastPressMillis > decayDelay) {
+    if (currentMillis - lastDecayMillis >= decayInterval) {
+      if (mood > minMood) {
+        mood--;
+      }
+      lastDecayMillis = currentMillis;
+    }
+  }
+
+  // Display mood as color
+  float brightnessInterval = 255 / 10.0;
+
+  if (mood <= neutralMood) {
+    // Red to Green transition
+    analogWrite(rLedPin, 255 - brightnessInterval * mood);
+    analogWrite(gLedPin, brightnessInterval * mood);
+    analogWrite(bLedPin, 0);
+  } else {
+    // Green to Blue transition
+    analogWrite(rLedPin, 0);
+    analogWrite(gLedPin, 255 - brightnessInterval * (mood - neutralMood));
+    analogWrite(bLedPin, brightnessInterval * (mood - neutralMood));
+  }
+
+  delay(50); // small delay for stability
+}

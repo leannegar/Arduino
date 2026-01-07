@@ -1,18 +1,3 @@
-/*
-  Light Stick Modes – Light Red Edition
-
-  Controls:
-  - Click: next mode
-      0) Blinking Rainbow
-      1) Solid Light Red
-      2) Blinking Light Red
-  - Hold (~800ms): toggle ON/OFF
-
-  Hardware:
-  - 1 RGB LED module (common anode: LOW = ON)
-  - 1 button module (VCC / S / GND)
-*/
-
 const byte BTN = 2;
 
 const byte PIN_R = 9;
